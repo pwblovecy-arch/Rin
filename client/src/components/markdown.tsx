@@ -428,8 +428,7 @@ export function Markdown({ content }: { content: string }) {
                 className="w-full rounded-xl border border-black/10 dark:border-white/10"
                 style={{ minHeight: "400px" }}
                 loading="lazy"
-               - referrerPolicy="no-referrer"
-+ referrerPolicy="strict-origin-when-cross-origin"
+                referrerPolicy="strict-origin-when-cross-origin"
                 sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
               />
             </div>
