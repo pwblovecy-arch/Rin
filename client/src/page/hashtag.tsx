@@ -38,7 +38,7 @@ export function HashtagPage({ name }: { name: string }) {
     const siteConfig = useSiteConfig();
     const [status, setStatus] = useState<'loading' | 'idle'>('idle')
     const [hashtag, setHashtag] = useState<FeedsData>()
-    const feedListClass = siteConfig.feedLayout === "masonry" ? "wauto columns-1 gap-5 md:columns-2" : "wauto flex flex-col";
+    const feedListClass = siteConfig.feedLayout === "masonry" ? "wauto columns-1 gap-5 md:columns-2 lg:columns-3 2xl:columns-4" : "wauto flex flex-col";
     const hashtagFeeds = Array.isArray(hashtag?.feeds) ? hashtag.feeds : [];
     const ref = useRef("")
     function fetchFeeds() {
