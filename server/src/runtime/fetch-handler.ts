@@ -4,6 +4,9 @@ const ROOT_FEED_PATTERN = /^\/(rss\.xml|atom\.xml|rss\.json|feed\.json|feed\.xml
 const APP_PUBLIC_ROUTE_PATTERN = /^\/(favicon|favicon\.ico)(?:\/|$)/;
 // 由 Worker 直接处理的元数据路由（sitemap / robots），需在静态资源分支之前路由到 Hono 应用
 const APP_META_ROUTE_PATTERN = /^\/(sitemap\.xml|robots\.txt)$/;
+// 文章分享页（/s/:id）：返回带 Open Graph 元信息的 HTML，
+// 供社交平台抓取分享卡片；必须在 SPA 兜底之前交给 Hono 应用
+const APP_SHARE_ROUTE_PATTERN = /^\/s\/[^/]+\/?$/;
 
 function isApiRequest(pathname: string) {
   return pathname.startsWith("/api/");
@@ -25,6 +28,10 @@ function isAppPublicRoute(pathname: string) {
 
 function isMetaRoute(pathname: string) {
   return APP_META_ROUTE_PATTERN.test(pathname);
+}
+
+function isShareRoute(pathname: string) {
+  return APP_SHARE_ROUTE_PATTERN.test(pathname);
 }
 
 function isStaticAssetRequest(pathname: string) {
@@ -85,6 +92,10 @@ export async function handleFetch(
 
   if (isMetaRoute(pathname)) {
     return getApp().fetch(request, env);
+  }
+
+  if (isShareRoute(pathname)) {
+    return getApp().fetch(request, env, executionContext);
   }
 
   if (isStaticAssetRequest(pathname)) {
