@@ -422,20 +422,55 @@ export function Markdown({ content }: { content: string }) {
           // 支持通过 data-aspect 指定内嵌比例（例如横版视频 data-aspect="16/9"）
           const rawProps = props as Record<string, unknown>;
           const aspect = rawProps["data-aspect"] as string | undefined;
-          return (
-            <div className="my-4 w-full">
-              <iframe
-                {...props}
-                src={src}
-                title={title || "Embedded content"}
-                className="w-full rounded-xl border border-black/10 dark:border-white/10"
-                style={aspect ? { aspectRatio: aspect } : { minHeight: "400px" }}
-                loading="lazy"
-                referrerPolicy="strict-origin-when-cross-origin"
-                sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
-              />
-            </div>
+          const poster = rawProps["data-mobile-poster"] as string | undefined;
+
+          const frame = (
+            <iframe
+              {...props}
+              src={src}
+              title={title || "Embedded content"}
+              className="w-full rounded-xl border border-black/10 dark:border-white/10"
+              style={aspect ? { aspectRatio: aspect } : { minHeight: "400px" }}
+              loading="lazy"
+              referrerPolicy="strict-origin-when-cross-origin"
+              sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
+            />
           );
+
+          // 横版视频（data-aspect）在手机上播放器内容（约 400px 起）装不下，
+          // 会出现黑屏或只剩一角的横向滚动，因此小屏改为「封面图 + 跳转」。
+          if (aspect && poster && src) {
+            return (
+              <div className="my-4 w-full">
+                <div className="hidden md:block">{frame}</div>
+                <a
+                  href={src}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="relative block overflow-hidden rounded-xl border border-black/10 dark:border-white/10 md:hidden"
+                >
+                  <img
+                    src={poster}
+                    alt={title || "视频封面"}
+                    className="block w-full"
+                    loading="lazy"
+                  />
+                  <span className="absolute inset-0 flex items-center justify-center bg-black/25">
+                    <span className="flex flex-col items-center gap-2">
+                      <span className="flex h-16 w-16 items-center justify-center rounded-full bg-white/90 shadow-lg">
+                        <i className="ri-play-fill text-3xl leading-none text-neutral-900" aria-hidden="true" />
+                      </span>
+                      <span className="rounded-full bg-black/55 px-3 py-1 text-xs text-white">
+                        点击到抖音观看
+                      </span>
+                    </span>
+                  </span>
+                </a>
+              </div>
+            );
+          }
+
+          return <div className="my-4 w-full">{frame}</div>;
         },
         div({ children, node, ...props }) {
           return <div {...props}>{children}</div>;
